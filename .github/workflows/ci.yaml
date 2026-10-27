@@ -111,7 +111,7 @@ jobs:
         shell: pwsh
         if: matrix.platform.target == 'x86_64-pc-windows-msvc' || matrix.platform.target == 'i686-pc-windows-msvc'
         run: |
-          if (-Not (Test-Path "$env:GITHUB_WORKSPACE\asio_sdk\common\asiodrivers.h")) {
+          if (-Not (Test-Path "$env:GITHUB_WORKSPACE\asio_sdk\common\asiodrvr.h")) {
             Write-Error "ASIO SDK structure wrong: asiodrivers.h not found"; exit 1
           }
 
