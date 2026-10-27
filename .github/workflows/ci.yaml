@@ -90,12 +90,22 @@ jobs:
         shell: pwsh
         if: matrix.platform.target == 'x86_64-pc-windows-msvc' || matrix.platform.target == 'i686-pc-windows-msvc'
         run: |
-          $zip = "$env:RUNNER_TEMP\asio_sdk.zip"
-          Invoke-WebRequest `
-            -Uri "https://github.com/decomp.me/asio-sdk/archive/refs/tags/v${{ env.ASIO_SDK_VERSION }}.zip" `
-            -OutFile $zip
+          $zip = "$env:RUNNER_TEMP\asiosdk.zip"
+          $url = "https://download.steinberg.net/sdk_downloads/ASIO-SDK_2.3.4_2025-10-15.zip"
+          try {
+            Invoke-WebRequest -Uri $url -OutFile $zip
+          } catch {
+            # Fallback: manche Server blocken Requests ohne Browser-User-Agent
+            Invoke-WebRequest -Uri $url -OutFile $zip `
+              -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+          }
           Expand-Archive -Path $zip -DestinationPath "$env:RUNNER_TEMP\asio_tmp"
-          Move-Item "$env:RUNNER_TEMP\asio_tmp\asio-sdk-$env:ASIO_SDK_VERSION" "$env:GITHUB_WORKSPACE\asio_sdk"
+          $src = Get-ChildItem "$env:RUNNER_TEMP\asio_tmp" -Directory | Select-Object -First 1
+          Move-Item $src.FullName "$env:GITHUB_WORKSPACE\asio_sdk"
+          if (-Not (Test-Path "$env:GITHUB_WORKSPACE\asio_sdk\common\asiodrivers.h")) {
+            Write-Error "ASIO SDK entpackt, aber common\asiodrivers.h fehlt – Zip-Struktur prüfen!"
+            exit 1
+          }
 
       - name: Verify ASIO SDK
         shell: pwsh
