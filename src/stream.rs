@@ -9,6 +9,7 @@ pub fn build(
     channels_to_record: &[usize],
     writers_in_stream: Arc<Mutex<Option<WriterHandles>>>,
 ) -> Result<cpal::Stream> {
+    let total_channels = config.channels() as usize;
     let stream_error_callback = move |err| {
         eprintln!("An error occurred on the input stream: {err}");
     };
@@ -16,25 +17,25 @@ pub fn build(
     match config.sample_format() {
         cpal::SampleFormat::I8 => Ok(device.build_input_stream(
             &config.into(),
-            process::<i8, i8>(channels_to_record.to_vec(), writers_in_stream),
+            process::<i8, i8>(total_channels, channels_to_record.to_vec(), writers_in_stream),
             stream_error_callback,
             None,
         )?),
         cpal::SampleFormat::I16 => Ok(device.build_input_stream(
             &config.into(),
-            process::<i16, i16>(channels_to_record.to_vec(), writers_in_stream),
+            process::<i16, i16>(total_channels, channels_to_record.to_vec(), writers_in_stream),
             stream_error_callback,
             None,
         )?),
         cpal::SampleFormat::I32 => Ok(device.build_input_stream(
             &config.into(),
-            process::<i32, i32>(channels_to_record.to_vec(), writers_in_stream),
+            process::<i32, i32>(total_channels, channels_to_record.to_vec(), writers_in_stream),
             stream_error_callback,
             None,
         )?),
         cpal::SampleFormat::F32 => Ok(device.build_input_stream(
             &config.into(),
-            process::<f32, f32>(channels_to_record.to_vec(), writers_in_stream),
+            process::<f32, f32>(total_channels, channels_to_record.to_vec(), writers_in_stream),
             stream_error_callback,
             None,
         )?),
@@ -47,6 +48,7 @@ pub fn build(
 
 #[allow(clippy::type_complexity)]
 fn process<T, U>(
+    total_channels: usize,
     channels_to_record: Vec<usize>,
     writers_in_stream: Arc<Mutex<Option<WriterHandles>>>,
 ) -> Box<dyn FnMut(&[T], &cpal::InputCallbackInfo) + Send + 'static>
