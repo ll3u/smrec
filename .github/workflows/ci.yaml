@@ -102,8 +102,8 @@ jobs:
           Expand-Archive -Path $zip -DestinationPath "$env:RUNNER_TEMP\asio_tmp"
           $src = Get-ChildItem "$env:RUNNER_TEMP\asio_tmp" -Directory | Select-Object -First 1
           Move-Item $src.FullName "$env:GITHUB_WORKSPACE\asio_sdk"
-          if (-Not (Test-Path "$env:GITHUB_WORKSPACE\asio_sdk\common\asiodrivers.h")) {
-            Write-Error "ASIO SDK entpackt, aber common\asiodrivers.h fehlt – Zip-Struktur prüfen!"
+          if (-Not (Test-Path "$env:GITHUB_WORKSPACE\asio_sdk\common\asiodrvr.h")) {
+            Write-Error "ASIO SDK entpackt, aber common\asiodrvr.h fehlt – Zip-Struktur prüfen!"
             exit 1
           }
 
