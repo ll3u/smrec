@@ -129,7 +129,7 @@ jobs:
             github.ref == 'refs/tags/test-release' )
 
       - name: Publish release artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: smrec-${{ matrix.platform.os_name }}
           path: "smrec-*"
@@ -144,7 +144,7 @@ jobs:
             github.ref == 'refs/tags/test-release' )
 
       - name: Publish GitHub release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           draft: true
           files: "smrec*"
