@@ -5,6 +5,7 @@ env:
   CRATE_NAME: smrec
   GITHUB_TOKEN: ${{ github.token }}
   RUST_BACKTRACE: 1
+  ASIO_SDK_VERSION: "2.3.3"
 jobs:
   test:
     name: ${{ matrix.platform.os_name }} with rust ${{ matrix.toolchain }}
@@ -19,11 +20,6 @@ jobs:
             target: x86_64-unknown-linux-gnu
             bin: smrec
             name: smrec-Linux-x86_64-gnu.tar.gz
-          # - os_name: Linux-i686
-          #   os: ubuntu-latest
-          #   target: i686-unknown-linux-gnu
-          #   bin: smrec
-          #   name: smrec-Linux-i686-gnu.tar.gz
 
           # Linux Gnu Arm
           - os_name: Linux-aarch64
@@ -90,7 +86,25 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libjack-jackd2-dev libasound2-dev
         if: matrix.platform.target == 'x86_64-unknown-linux-gnu'
 
-      # --locked can be added later
+      - name: Download ASIO SDK
+        shell: pwsh
+        if: matrix.platform.target == 'x86_64-pc-windows-msvc' || matrix.platform.target == 'i686-pc-windows-msvc'
+        run: |
+          $zip = "$env:RUNNER_TEMP\asio_sdk.zip"
+          Invoke-WebRequest `
+            -Uri "https://github.com/decomp.me/asio-sdk/archive/refs/tags/v${{ env.ASIO_SDK_VERSION }}.zip" `
+            -OutFile $zip
+          Expand-Archive -Path $zip -DestinationPath "$env:RUNNER_TEMP\asio_tmp"
+          Move-Item "$env:RUNNER_TEMP\asio_tmp\asio-sdk-$env:ASIO_SDK_VERSION" "$env:GITHUB_WORKSPACE\asio_sdk"
+
+      - name: Verify ASIO SDK
+        shell: pwsh
+        if: matrix.platform.target == 'x86_64-pc-windows-msvc' || matrix.platform.target == 'i686-pc-windows-msvc'
+        run: |
+          if (-Not (Test-Path "$env:GITHUB_WORKSPACE\asio_sdk\common\asiodrivers.h")) {
+            Write-Error "ASIO SDK structure wrong: asiodrivers.h not found"; exit 1
+          }
+
       - name: Build binary
         uses: houseabsolute/actions-rust-cross@v0
         with:
@@ -100,10 +114,8 @@ jobs:
           args: "--release"
           strip: true
         env:
-          # Build environment variables
-          GITHUB_ENV: ${{ github.workspace }}/.env
+          ASIO_SDK_DIR: ${{ github.workspace }}\asio_sdk
 
-      # --locked can be added later
       - name: Run tests
         uses: houseabsolute/actions-rust-cross@v0
         with:
@@ -111,6 +123,8 @@ jobs:
           target: ${{ matrix.platform.target }}
           toolchain: ${{ matrix.toolchain }}
           args: "--release"
+        env:
+          ASIO_SDK_DIR: ${{ github.workspace }}\asio_sdk
         if: ${{ !matrix.platform.skip_tests }}
 
       - name: Package as archive
