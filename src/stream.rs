@@ -68,13 +68,13 @@ where
         // Channels to record has an ascending order, so does the interleaved data.
 
         // Process the frame
-        for frame in data.chunks(channels_to_record.len()) {
+        for frame in data.chunks(total_channels) {
             // We have one sample for each channel in this frame since we're recording mono.
 
-            for (channel_idx, sample) in frame.iter().enumerate() {
+            for (i, &ch) in channels_to_record.iter().enumerate() {
                 // Put that sample in the corresponding channel buffer.
                 // De-interleave the data in other words.
-                channel_buffer[channel_idx].push(*sample);
+                channel_buffer[i].push(frame[ch]);
             }
         }
 
