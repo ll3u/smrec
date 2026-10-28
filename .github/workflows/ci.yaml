@@ -91,33 +91,12 @@ jobs:
         if: matrix.platform.target == 'x86_64-pc-windows-msvc' || matrix.platform.target == 'i686-pc-windows-msvc'
         run: |
           $zip = "$env:RUNNER_TEMP\asiosdk.zip"
-          $tmp = "$env:RUNNER_TEMP\asio_tmp"
-
           Invoke-WebRequest `
             -Uri "https://download.steinberg.net/sdk_downloads/ASIO-SDK_2.3.4_2025-10-15.zip" `
             -OutFile $zip
-          Expand-Archive -Path $zip -DestinationPath $tmp
-
-          $marker = Get-ChildItem $tmp -Recurse -Filter "asiodrvr.h" | Select-Object -First 1
-          if (-Not $marker) {
-            Write-Error "asiodrvr.h nicht im Zip gefunden – Struktur:"
-            Get-ChildItem $tmp -Recurse | Select-Object FullName
-            exit 1
-          }
-          $sdkRoot = Split-Path (Split-Path $marker.FullName -Parent) -Parent
-          if (Test-Path "$env:ASIO_SDK_DIR") { Remove-Item "$env:ASIO_SDK_DIR" -Recurse -Force }
-          Move-Item $sdkRoot "$env:ASIO_SDK_DIR"
-
-      - name: Verify ASIO SDK
-        shell: pwsh
-        if: matrix.platform.target == 'x86_64-pc-windows-msvc' || matrix.platform.target == 'i686-pc-windows-msvc'
-        run: |
-          Write-Host "Prüfe: $env:ASIO_SDK_DIR\common\asiodrvr.h"
-          if (-Not (Test-Path "$env:ASIO_SDK_DIR\common\asiodrvr.h")) {
-            Write-Host "Fehlgeschlagen. Inhalt von $env:GITHUB_WORKSPACE:"
-            Get-ChildItem "$env:GITHUB_WORKSPACE" -Recurse -Depth 2 | Select-Object FullName
-            Write-Error "ASIO SDK fehlt unter $env:ASIO_SDK_DIR"; exit 1
-          }
+          Expand-Archive -Path $zip -DestinationPath "$env:RUNNER_TEMP\asio_tmp"
+          $src = Get-ChildItem "$env:RUNNER_TEMP\asio_tmp" -Directory | Select-Object -First 1
+          Move-Item $src.FullName "$env:GITHUB_WORKSPACE\asio_sdk"
 
       - name: Build binary
         uses: houseabsolute/actions-rust-cross@v0
