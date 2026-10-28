@@ -71,7 +71,7 @@ pub fn enumerate_audio() -> Result<()> {
                 println!(
                     "            Channels: {}\n            Sample Rate: {}\n            Buffer Size {}\n            Sample Format: {}",
                     conf.channels(),
-                    conf.sample_rate().0,
+                    conf.sample_rate(),
                     match conf.buffer_size() {
                         cpal::SupportedBufferSize::Unknown => "unknown".to_string(),
                         cpal::SupportedBufferSize::Range { min, max } =>
