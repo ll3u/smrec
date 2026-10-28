@@ -5,7 +5,7 @@ env:
   CRATE_NAME: smrec
   GITHUB_TOKEN: ${{ github.token }}
   RUST_BACKTRACE: 1
-  ASIO_SDK_VERSION: "2.3.3"
+  ASIO_SDK_VERSION: "2.3.4"
 jobs:
   test:
     name: ${{ matrix.platform.os_name }} with rust ${{ matrix.toolchain }}
@@ -107,7 +107,7 @@ jobs:
           args: "--release"
           strip: true
         env:
-          ASIO_SDK_DIR: ${{ github.workspace }}\asio_sdk
+          ASIO_SDK_DIR: "${{ runner.temp }}\\asio_sdk"
 
       - name: Run tests
         uses: houseabsolute/actions-rust-cross@v0
@@ -117,7 +117,7 @@ jobs:
           toolchain: ${{ matrix.toolchain }}
           args: "--release"
         env:
-          ASIO_SDK_DIR: ${{ github.workspace }}\asio_sdk
+          ASIO_SDK_DIR: "${{ runner.temp }}\\asio_sdk"
         if: ${{ !matrix.platform.skip_tests }}
 
       - name: Package as archive
