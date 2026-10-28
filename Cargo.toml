@@ -19,11 +19,11 @@ exclude = [
 
 # When https://github.com/RustAudio/cpal/issues/794 is resolved this can continue to track the stable release.
 [target.'cfg(target_os = "windows")'.dependencies]
-cpal = { git = "https://github.com/RustAudio/cpal.git", features = ["asio"] }
+cpal = { version = "0.18", features = ["asio"] }
 midir = { version = "0.9", features = ["winrt"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
-cpal = { git = "https://github.com/RustAudio/cpal.git", features = ["jack"] }
+cpal = { version = "0.18", features = ["jack"] }
 midir = { version = "0.9", features = ["jack"] }
 
 # [target.'cfg(target_os = "windows")'.dependencies]
@@ -50,5 +50,3 @@ ctrlc = "3.1"
 thiserror = "1.0"
 glob-match = "0.2"
 nom = "7"
-# cpal = "0.15"
-cpal = { git = "https://github.com/RustAudio/cpal.git" }
