@@ -18,7 +18,7 @@ pub fn spec_from_config(config: &cpal::SupportedStreamConfig) -> hound::WavSpec 
     hound::WavSpec {
         // Hardcoded because channels will be always mono.
         channels: 1,
-        sample_rate: config.sample_rate().0 as _,
+        sample_rate: config.sample_rate() as _,
         // Truncation is safe because we're only using 8, 16, 24 and 32 bit samples.
         bits_per_sample: (config.sample_format().sample_size() * 8) as _,
         sample_format: sample_format(config.sample_format()),

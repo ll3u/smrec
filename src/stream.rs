@@ -16,25 +16,25 @@ pub fn build(
 
     match config.sample_format() {
         cpal::SampleFormat::I8 => Ok(device.build_input_stream(
-            &config.into(),
+            config.into(),
             process::<i8, i8>(total_channels, channels_to_record.to_vec(), writers_in_stream),
             stream_error_callback,
             None,
         )?),
         cpal::SampleFormat::I16 => Ok(device.build_input_stream(
-            &config.into(),
+            config.into(),
             process::<i16, i16>(total_channels, channels_to_record.to_vec(), writers_in_stream),
             stream_error_callback,
             None,
         )?),
         cpal::SampleFormat::I32 => Ok(device.build_input_stream(
-            &config.into(),
+            config.into(),
             process::<i32, i32>(total_channels, channels_to_record.to_vec(), writers_in_stream),
             stream_error_callback,
             None,
         )?),
         cpal::SampleFormat::F32 => Ok(device.build_input_stream(
-            &config.into(),
+            config.into(),
             process::<f32, f32>(total_channels, channels_to_record.to_vec(), writers_in_stream),
             stream_error_callback,
             None,

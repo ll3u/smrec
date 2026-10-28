@@ -19,7 +19,7 @@ pub fn enumerate_audio() -> Result<()> {
                 println!("    Default Input Device:\n        None");
             },
             |d| {
-                println!("    Default Input Device:\n        {}", d.name().unwrap());
+                println!("    Default Input Device:\n        {}", d.description().unwrap().name());
             },
         );
         host.default_output_device().map_or_else(
@@ -27,7 +27,7 @@ pub fn enumerate_audio() -> Result<()> {
                 println!("    Default Output Device:\n        None");
             },
             |d| {
-                println!("    Default Output Device:\n        {}", d.name().unwrap());
+                println!("    Default Output Device:\n        {}", d.description().unwrap().name());
             },
         );
 
@@ -35,7 +35,7 @@ pub fn enumerate_audio() -> Result<()> {
         println!();
         println!("  {} Available Devices:", host_id.name());
         for (device_index, device) in devices.enumerate() {
-            println!("    {}. \"{}\"", device_index + 1, device.name()?);
+            println!("    {}. \"{}\"", device_index + 1, device.description()?.name());
 
             // Input configs
             if let Ok(conf) = device.default_input_config() {
@@ -45,7 +45,7 @@ pub fn enumerate_audio() -> Result<()> {
                 println!(
                     "            Channels: {}\n            Sample Rate: {}\n            Buffer Size {}\n            Sample Format: {}",
                     conf.channels(),
-                    conf.sample_rate().0,
+                    conf.sample_rate(),
                     match conf.buffer_size() {
                         cpal::SupportedBufferSize::Unknown => "unknown".to_string(),
                         cpal::SupportedBufferSize::Range { min, max } =>

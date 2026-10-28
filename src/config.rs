@@ -79,7 +79,7 @@ pub fn choose_device(host: &cpal::Host, device: Option<String>) -> Result<cpal::
         let devices = host.devices()?;
         let device = devices
             .enumerate()
-            .find(|(_device_index, device)| device.name().expect("Later") == chosen_device_name);
+            .find(|(_device_index, device)| device.description().expect("Later").name() == chosen_device_name);
         if let Some((_, device)) = device {
             Ok(device)
         } else {
